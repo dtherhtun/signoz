@@ -8,10 +8,12 @@ import {
 	getServicesMetrics,
 	metricItem,
 	getTopEndpoints,
+	getDbOverViewMetrics,
 	getExternalMetrics,
 	externalMetricsAvgDurationItem,
 	externalErrCodeMetricsItem,
 	externalMetricsItem,
+	dbOverviewMetricsItem,
 	getExternalAvgDurationMetrics,
 	getExternalErrCodeMetrics,
 	topEndpointListItem,
@@ -29,10 +31,12 @@ const { TabPane } = Tabs;
 
 interface ServicesMetricsProps extends RouteComponentProps<any> {
 	serviceMetrics: metricItem[];
+	dbOverviewMetrics: dbOverviewMetricsItem[];
 	getServicesMetrics: Function;
 	getExternalMetrics: Function;
 	getExternalErrCodeMetrics: Function;
 	getExternalAvgDurationMetrics: Function;
+	getDbOverViewMetrics: Function;
 	externalMetrics: externalMetricsItem[];
 	topEndpointsList: topEndpointListItem[];
 	externalAvgDurationMetrics: externalMetricsAvgDurationItem[];
@@ -50,6 +54,7 @@ const _ServiceMetrics = (props: ServicesMetricsProps) => {
 		props.getExternalMetrics(servicename, props.globalTime);
 		props.getExternalErrCodeMetrics(servicename, props.globalTime);
 		props.getExternalAvgDurationMetrics(servicename, props.globalTime);
+		props.getDbOverViewMetrics(servicename, props.globalTime);
 	}, [props.globalTime, servicename]);
 
 	const onTracePopupClick = (timestamp: number) => {
@@ -108,9 +113,9 @@ const _ServiceMetrics = (props: ServicesMetricsProps) => {
 					<Col span={12}>
 						<Card bodyStyle={{ padding: 10 }}>
 							<ExternalApiGraph
-								title=" External Call Error Rate"
+								title="External Call Error Percentage (%)"
 								keyIdentifier="externalHttpUrl"
-								dataIdentifier="numCalls"
+								dataIdentifier="errorRate"
 								data={props.externalErrCodeMetrics}
 							/>
 						</Card>
@@ -154,6 +159,33 @@ const _ServiceMetrics = (props: ServicesMetricsProps) => {
 					</Col>
 				</Row>
 			</TabPane>
+
+			<TabPane tab="Database Calls" key="3">
+				<Row gutter={32} style={{ margin: 20 }}>
+					<Col span={12}>
+						<Card bodyStyle={{ padding: 10 }}>
+							<ExternalApiGraph
+								title="Database Calls RPS"
+								keyIdentifier="dbSystem"
+								dataIdentifier="callRate"
+								data={props.dbOverviewMetrics}
+							/>
+						</Card>
+					</Col>
+
+					<Col span={12}>
+						<Card bodyStyle={{ padding: 10 }}>
+							<ExternalApiGraph
+								label="Average Duration"
+								title="DataBase Calls Avg Duration"
+								dataIdentifier="avgDuration"
+								fnDataIdentifier={(s) => Number(s) / 1000000}
+								data={props.dbOverviewMetrics}
+							/>
+						</Card>
+					</Col>
+				</Row>
+			</TabPane>
 		</Tabs>
 	);
 };
@@ -166,6 +198,7 @@ const mapStateToProps = (
 	externalAvgDurationMetrics: externalMetricsAvgDurationItem[];
 	externalErrCodeMetrics: externalErrCodeMetricsItem[];
 	externalMetrics: externalMetricsItem[];
+	dbOverviewMetrics: dbOverviewMetricsItem[];
 	globalTime: GlobalTime;
 } => {
 	return {
@@ -174,6 +207,7 @@ const mapStateToProps = (
 		topEndpointsList: state.topEndpointsList,
 		externalMetrics: state.externalMetrics,
 		globalTime: state.globalTime,
+		dbOverviewMetrics: state.dbOverviewMetrics,
 		externalAvgDurationMetrics: state.externalAvgDurationMetrics,
 	};
 };
@@ -186,5 +220,6 @@ export const ServiceMetrics = withRouter(
 		getExternalAvgDurationMetrics: getExternalAvgDurationMetrics,
 		getTopEndpoints: getTopEndpoints,
 		updateTimeInterval: updateTimeInterval,
+		getDbOverViewMetrics: getDbOverViewMetrics,
 	})(_ServiceMetrics),
 );
