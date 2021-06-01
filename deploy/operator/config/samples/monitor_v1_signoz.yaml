@@ -1,0 +1,57 @@
+apiVersion: monitor.signoz.io/v1
+kind: Signoz
+metadata:
+  name: signoz-sample
+spec:
+  # Default values copied from <project_dir>/helm-charts/signoz/values.yaml
+  frontend:
+    enabled: true
+    named: frontend
+
+    image:
+      repository: signoz/frontend
+      pullPolicy: IfNotPresent
+
+  zookeeper:
+    enabled: true
+    name: zookeeper
+
+    image:
+      repository: bitnami/zookeeper:3.6.2-debian-10-r58
+      pullPolicy: IfNotPresent
+
+  kafka:
+    enabled: true
+    name: kafka
+
+    image:
+      repository: bitnami/kafka:2.6.0-debian-10-r78
+      pullPolicy: IfNotPresent
+
+  druid:
+    enabled: true
+    name: druid
+
+    image:
+      repository: apache/druid:0.19.0
+      pullPolicy: IfNotPresent
+    
+  flattener-processor:
+    enabled: true
+    name: flattener-processor
+
+    image:
+      repository: signoz/flattener-processor
+      pullPolicy: IfNotPresent
+
+  query-service:
+    enabled: true
+    name: query-service
+
+    image:
+      repository: signoz/query-service
+      pullPolicy: IfNotPresent
+    
+
+  
+  
